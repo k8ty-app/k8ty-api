@@ -23,7 +23,7 @@ lazy val root = (project in file("."))
     ),
     addCompilerPlugin("org.typelevel" %% "kind-projector"     % "0.10.3"),
     addCompilerPlugin("com.olegpy"    %% "better-monadic-for" % "0.3.1")
-  )
+  ).enablePlugins(DockerPlugin, JavaServerAppPackaging)
 
 scalacOptions ++= Seq(
   "-deprecation",
@@ -33,3 +33,6 @@ scalacOptions ++= Seq(
   "-feature",
   "-Xfatal-warnings",
 )
+
+dockerExposedPorts  ++= Seq(9000)
+dockerBaseImage := "adoptopenjdk/openjdk14-openj9"
