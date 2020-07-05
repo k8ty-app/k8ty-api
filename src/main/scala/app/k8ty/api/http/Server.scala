@@ -1,6 +1,9 @@
 package app.k8ty.api.http
 
+import app.k8ty.api.environment.Environments.AppEnvironment
+import app.k8ty.api.config.Configuration.HttpServerConfig
 import app.k8ty.api.http.endpoints.HealthEndpoint
+
 import cats.data.Kleisli
 import cats.effect.ExitCode
 import cats.implicits._
@@ -10,19 +13,21 @@ import org.http4s.server.Router
 import org.http4s.server.middleware.{ AutoSlash, GZip }
 import org.http4s.{ HttpRoutes, Request, Response }
 import zio.interop.catz._
-import zio._
+import zio.{ RIO, ZIO }
+
 
 object Server {
-  type ServerRIO[A] = RIO[ZEnv, A]
+  type ServerRIO[A] = RIO[AppEnvironment, A]
   type ServerRoutes = Kleisli[ServerRIO, Request[ServerRIO], Response[ServerRIO]]
 
-  def runServer: ZIO[ZEnv, Throwable, Unit] =
-    ZIO.runtime[ZEnv].flatMap { implicit rts =>
+  def runServer: ZIO[AppEnvironment, Nothing, Unit] =
+    ZIO.runtime[AppEnvironment].flatMap { implicit rts =>
+      val cfg = rts.environment.get[HttpServerConfig]
       val ec = rts.platform.executor.asEC
 
       BlazeServerBuilder[ServerRIO](ec)
-        .bindHttp(9000, "0.0.0.0")
-        .withHttpApp(createRoutes("/"))
+        .bindHttp(cfg.port, cfg.host)
+        .withHttpApp(createRoutes(cfg.path))
         .serve
         .compile[ServerRIO, ServerRIO, ExitCode]
         .drain
@@ -30,7 +35,7 @@ object Server {
       .orDie
 
   def createRoutes(basePath: String): ServerRoutes = {
-    val healthRoutes = new HealthEndpoint[ZEnv].routes
+    val healthRoutes = new HealthEndpoint[AppEnvironment].routes
     val routes = healthRoutes
 
     Router[ServerRIO](basePath -> middleware(routes)).orNotFound

@@ -19,7 +19,8 @@ lazy val root = (project in file("."))
       "ch.qos.logback"  %  "logback-classic"     % LogbackVersion,
       "dev.zio"         %% "zio"                 % "1.0.0-RC21-1",
       "dev.zio"         %% "zio-logging"         % "0.3.2",
-      "dev.zio"         %% "zio-interop-cats"    % "2.1.3.0-RC16"
+      "dev.zio"         %% "zio-interop-cats"    % "2.1.3.0-RC16",
+      "com.github.pureconfig" %% "pureconfig" % "0.13.0"
     ),
     addCompilerPlugin("org.typelevel" %% "kind-projector"     % "0.10.3"),
     addCompilerPlugin("com.olegpy"    %% "better-monadic-for" % "0.3.1")
