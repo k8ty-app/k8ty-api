@@ -21,7 +21,7 @@ object Server {
       val ec = rts.platform.executor.asEC
 
       BlazeServerBuilder[ServerRIO](ec)
-        .bindHttp(9000, "localhost")
+        .bindHttp(9000, "0.0.0.0")
         .withHttpApp(createRoutes("/"))
         .serve
         .compile[ServerRIO, ServerRIO, ExitCode]
