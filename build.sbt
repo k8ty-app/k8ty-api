@@ -14,13 +14,20 @@ lazy val root = (project in file("."))
       "org.http4s"      %% "http4s-blaze-client" % Http4sVersion,
       "org.http4s"      %% "http4s-circe"        % Http4sVersion,
       "org.http4s"      %% "http4s-dsl"          % Http4sVersion,
+      "io.circe"        %% "circe-core"       % CirceVersion,
       "io.circe"        %% "circe-generic"       % CirceVersion,
+      "io.circe"        %% "circe-parser"       % CirceVersion,
       "org.specs2"      %% "specs2-core"         % Specs2Version % "test",
       "ch.qos.logback"  %  "logback-classic"     % LogbackVersion,
       "dev.zio"         %% "zio"                 % "1.0.0-RC21-1",
       "dev.zio"         %% "zio-logging"         % "0.3.2",
       "dev.zio"         %% "zio-interop-cats"    % "2.1.3.0-RC16",
-      "com.github.pureconfig" %% "pureconfig" % "0.13.0"
+      "com.github.pureconfig" %% "pureconfig" % "0.13.0",
+      "org.tpolecat" %% "doobie-core" % "0.9.0",
+      "org.tpolecat" %% "doobie-postgres" % "0.9.0",
+      "org.tpolecat" %% "doobie-quill" % "0.9.0",
+      "io.getquill" %% "quill-jdbc" % "3.5.2",
+      "org.postgresql" % "postgresql" % "42.2.14"
     ),
     addCompilerPlugin("org.typelevel" %% "kind-projector"     % "0.10.3"),
     addCompilerPlugin("com.olegpy"    %% "better-monadic-for" % "0.3.1")
