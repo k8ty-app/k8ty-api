@@ -14,6 +14,7 @@ import org.http4s.server.middleware.{ AutoSlash, GZip }
 import org.http4s.{ HttpRoutes, Request, Response }
 import zio.interop.catz._
 import zio.{ RIO, ZIO }
+import app.k8ty.api.http.endpoints.CoffeeEndpoint
 
 
 object Server {
@@ -36,7 +37,8 @@ object Server {
 
   def createRoutes(basePath: String): ServerRoutes = {
     val healthRoutes = new HealthEndpoint[AppEnvironment].routes
-    val routes = healthRoutes
+    val coffeeRoutes = new CoffeeEndpoint[AppEnvironment].routes
+    val routes = healthRoutes <+> coffeeRoutes
 
     Router[ServerRIO](basePath -> middleware(routes)).orNotFound
   }

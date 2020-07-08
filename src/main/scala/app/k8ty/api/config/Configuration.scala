@@ -6,19 +6,19 @@ import zio._
 
 object Configuration {
 
-    type HasConfiguration = Has[HttpServerConfig]
-
-    // Confuratuon for out http4s server
+    // Configuration for out DB
+    final case class DbConfig(driver: String, url: String)
+    // Configuration for out http4s server
     final case class HttpServerConfig(host: String, port: Int, path: String)
 
     // A global Config, that right now only contains our http4s server config
-    final case class AppConfig(httpServer: HttpServerConfig)
+    final case class AppConfig(httpServer: HttpServerConfig, database: DbConfig)
 
 
-    val live: ULayer[HasConfiguration] = ZLayer.fromEffectMany(
+    val live: ULayer[Configuration] = ZLayer.fromEffectMany(
         ZIO.effect(ConfigSource.default.loadOrThrow[AppConfig]) // Load our Configuration
-        .map(c => Has(c.httpServer)) // Map it to Has out case classes
-        .orDie 
+        .map(c => Has(c.httpServer) ++ Has(c.database)) // Map it to Has out case classes
+        .orDie
     )
 
 }

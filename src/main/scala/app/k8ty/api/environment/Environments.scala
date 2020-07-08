@@ -5,12 +5,16 @@ import app.k8ty.api.config.Configuration._
 
 import zio._
 import zio.clock.Clock
+import app.k8ty.api.repository.CoffeeRepository
+import app.k8ty.api.repository.DbTransactor
 
 object Environments {
-    type HttpServerEnvironment = HasConfiguration with Clock
-    type AppEnvironment = HttpServerEnvironment
+    type HttpServerEnvironment = Configuration with Clock
+    type AppEnvironment = HttpServerEnvironment with CoffeeRepository
 
     val httpServerEnvironment: ULayer[HttpServerEnvironment] = Configuration.live ++ Clock.live
-    val appEnvironment: ULayer[AppEnvironment] = httpServerEnvironment
+    val dbTransactor: ULayer[DbTransactor] = Configuration.live >>> DbTransactor.postgres
+    val coffeeRepository: ULayer[CoffeeRepository] = dbTransactor >>> CoffeeRepository.live
+    val appEnvironment: ULayer[AppEnvironment] = httpServerEnvironment ++ coffeeRepository
 
 }
