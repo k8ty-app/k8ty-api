@@ -10,29 +10,32 @@ import cats.implicits._
 import org.http4s.implicits._
 import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.server.Router
-import org.http4s.server.middleware.{ AutoSlash, GZip }
-import org.http4s.{ HttpRoutes, Request, Response }
+import org.http4s.server.middleware.{AutoSlash, GZip, CORS, CORSConfig}
+import org.http4s.{HttpRoutes, Request, Response}
 import zio.interop.catz._
-import zio.{ RIO, ZIO }
+import zio.{RIO, ZIO}
 import app.k8ty.api.http.endpoints.CoffeeEndpoint
-
+import scala.concurrent.duration._
 
 object Server {
   type ServerRIO[A] = RIO[AppEnvironment, A]
-  type ServerRoutes = Kleisli[ServerRIO, Request[ServerRIO], Response[ServerRIO]]
+  type ServerRoutes =
+    Kleisli[ServerRIO, Request[ServerRIO], Response[ServerRIO]]
 
   def runServer: ZIO[AppEnvironment, Nothing, Unit] =
-    ZIO.runtime[AppEnvironment].flatMap { implicit rts =>
-      val cfg = rts.environment.get[HttpServerConfig]
-      val ec = rts.platform.executor.asEC
+    ZIO
+      .runtime[AppEnvironment]
+      .flatMap { implicit rts =>
+        val cfg = rts.environment.get[HttpServerConfig]
+        val ec = rts.platform.executor.asEC
 
-      BlazeServerBuilder[ServerRIO](ec)
-        .bindHttp(cfg.port, cfg.host)
-        .withHttpApp(createRoutes(cfg.path))
-        .serve
-        .compile[ServerRIO, ServerRIO, ExitCode]
-        .drain
-    }
+        BlazeServerBuilder[ServerRIO](ec)
+          .bindHttp(cfg.port, cfg.host)
+          .withHttpApp(createRoutes(cfg.path))
+          .serve
+          .compile[ServerRIO, ServerRIO, ExitCode]
+          .drain
+      }
       .orDie
 
   def createRoutes(basePath: String): ServerRoutes = {
@@ -43,11 +46,20 @@ object Server {
     Router[ServerRIO](basePath -> middleware(routes)).orNotFound
   }
 
+  private val originConfig = CORSConfig(
+    anyOrigin = false,
+    allowedOrigins = Set("https://k8ty.app"),
+    allowCredentials = false,
+    maxAge = 1.day.toSeconds
+  )
+
   private val middleware: HttpRoutes[ServerRIO] => HttpRoutes[ServerRIO] = {
     { http: HttpRoutes[ServerRIO] =>
       AutoSlash(http)
     }.andThen { http: HttpRoutes[ServerRIO] =>
       GZip(http)
+    }.andThen { http: HttpRoutes[ServerRIO] =>
+      CORS(http, originConfig)
     }
   }
 }
