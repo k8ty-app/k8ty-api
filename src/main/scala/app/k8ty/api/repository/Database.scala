@@ -24,7 +24,7 @@ private[repository] final case class Database(xa: Transactor[Task])
 
   private object Queries {
 
-    val allRoasts = quote(query[CoffeeRoasts])
+    val allRoasts = quote(query[CoffeeRoasts].sortBy(_.id)(Ord.desc))
 
     def roastById(id: Int) =
       quote {
