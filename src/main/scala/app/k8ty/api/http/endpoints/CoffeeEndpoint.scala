@@ -24,11 +24,19 @@ final class CoffeeEndpoint[R <: CoffeeRepository] {
   import dsl._
 
   private val httpRoutes = HttpRoutes.of[CoffeeTask] {
+    
     case GET -> Root / "roasts" =>  {
       val pipeline: CoffeeTask[CoffeeRoastStream] = allRoasts
       for {
         stream <- pipeline
         json <- Ok(stream.map(_.asJson))
+      } yield json
+    }
+
+    case GET -> Root / "roasts" / IntVar(id) => {
+      for {
+        roast <- roastById(id)
+        json <- Ok(roast.map(_.asJson))
       } yield json
     }
   }
