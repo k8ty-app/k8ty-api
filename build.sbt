@@ -27,7 +27,8 @@ lazy val root = (project in file("."))
       "org.tpolecat" %% "doobie-postgres" % "0.9.0",
       "org.tpolecat" %% "doobie-quill" % "0.9.0",
       "io.getquill" %% "quill-jdbc" % "3.5.2",
-      "org.postgresql" % "postgresql" % "42.2.14"
+      "org.postgresql" % "postgresql" % "42.2.14",
+      "com.google.firebase" % "firebase-admin" % "6.14.0"
     ),
     addCompilerPlugin("org.typelevel" %% "kind-projector"     % "0.10.3"),
     addCompilerPlugin("com.olegpy"    %% "better-monadic-for" % "0.3.1")
