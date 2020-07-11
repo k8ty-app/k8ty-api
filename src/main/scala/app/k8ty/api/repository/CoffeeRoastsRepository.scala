@@ -39,4 +39,9 @@ extends CoffeeRoastsRepository.Service {
   }
 }
 
+trait CoffeeRoastsRepositoryPackage {
+  type CoffeeRoastsRepository = Has[CoffeeRoastsRepository.Service]
+  def allRoasts: RIO[CoffeeRoastsRepository, fs2.Stream[Task, CoffeeRoasts]] = RIO.access(_.get.allRoasts)
+  def roastById(id: Int): RIO[CoffeeRoastsRepository, Task[Option[CoffeeRoasts]]] = RIO.access(_.get.roastById(id))
+}
 
