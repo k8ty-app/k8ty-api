@@ -14,7 +14,7 @@ import org.http4s.server.middleware.{AutoSlash, GZip, CORS, CORSConfig}
 import org.http4s.{HttpRoutes, Request, Response}
 import zio.interop.catz._
 import zio.{RIO, ZIO}
-import app.k8ty.api.http.endpoints.CoffeeEndpoint
+import app.k8ty.api.http.endpoints.CoffeeRoastsEndpoint
 import scala.concurrent.duration._
 
 object Server {
@@ -40,7 +40,7 @@ object Server {
 
   def createRoutes(basePath: String): ServerRoutes = {
     val healthRoutes = new HealthEndpoint[AppEnvironment].routes
-    val coffeeRoutes = new CoffeeEndpoint[AppEnvironment].routes
+    val coffeeRoutes = new CoffeeRoastsEndpoint[AppEnvironment].routes
     val routes = healthRoutes <+> coffeeRoutes
 
     Router[ServerRIO](basePath -> middleware(routes)).orNotFound

@@ -1,20 +1,20 @@
 package app.k8ty.api
 
 import app.k8ty.api.config.Configuration.DbConfig
-import app.k8ty.api.models.CoffeeRoasts
+import app.k8ty.api.repository.models.CoffeeRoasts
 import doobie.util.transactor.Transactor
 import zio._
 import zio.interop.catz._
 
 package object repository {
 
+  // CoffeeRoastRepository
+  type CoffeeRoastsRepository = Has[CoffeeRoastsRepository.Service]
+  def allRoasts: RIO[CoffeeRoastsRepository, fs2.Stream[Task, CoffeeRoasts]] = RIO.access(_.get.allRoasts)
+  def roastById(id: Int): RIO[CoffeeRoastsRepository, Task[Option[CoffeeRoasts]]] = RIO.access(_.get.roastById(id))
+
+
   type DbTransactor = Has[DbTransactor.Resource]
-  type CoffeeRepository = Has[CoffeeRepository.Service]
-
-  // Our Coffee Roasts
-  def allRoasts: RIO[CoffeeRepository, fs2.Stream[Task, CoffeeRoasts]] = RIO.access(_.get.allRoasts)
-  def roastById(id: Int): RIO[CoffeeRepository, Task[Option[CoffeeRoasts]]] = RIO.access(_.get.roastById(id))
-
 
   object DbTransactor {
     trait Resource {

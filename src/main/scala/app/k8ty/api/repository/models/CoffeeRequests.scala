@@ -1,4 +1,4 @@
-package app.k8ty.api.models
+package app.k8ty.api.repository.models
 
 import io.circe.Encoder
 import io.circe.generic.semiauto.deriveEncoder

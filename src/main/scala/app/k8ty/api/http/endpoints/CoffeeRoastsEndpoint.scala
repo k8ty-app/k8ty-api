@@ -1,6 +1,6 @@
 package app.k8ty.api.http.endpoints
 
-import app.k8ty.api.models.CoffeeRoasts
+import app.k8ty.api.repository.models.CoffeeRoasts
 import zio.RIO
 import io.circe.Encoder
 import org.http4s.{EntityEncoder, HttpRoutes}
@@ -12,20 +12,20 @@ import org.http4s.server.Router
 import zio.interop.catz._
 import app.k8ty.api.repository._
 
-final class CoffeeEndpoint[R <: CoffeeRepository] {
+final class CoffeeRoastsEndpoint[R <: CoffeeRoastsRepository] {
   type CoffeeTask[A] = RIO[R,A]
   type CoffeeRoastStream = fs2.Stream[CoffeeTask, CoffeeRoasts]
 
   implicit def jsonEncoder[F[_] : Applicative, A](implicit encoder: Encoder[A]): EntityEncoder[F, A] =
     jsonEncoderOf[F, A]
-  private val prefixPath = "/coffee"
+  private val prefixPath = "/coffee/roasts"
 
   val dsl: Http4sDsl[CoffeeTask] = Http4sDsl[CoffeeTask]
   import dsl._
 
   private val httpRoutes = HttpRoutes.of[CoffeeTask] {
-    
-    case GET -> Root / "roasts" =>  {
+
+    case GET -> Root =>  {
       val pipeline: CoffeeTask[CoffeeRoastStream] = allRoasts
       for {
         stream <- pipeline
@@ -33,7 +33,7 @@ final class CoffeeEndpoint[R <: CoffeeRepository] {
       } yield json
     }
 
-    case GET -> Root / "roasts" / IntVar(id) => {
+    case GET -> Root / IntVar(id) => {
       for {
         roast <- roastById(id)
         json <- Ok(roast.map(_.asJson))
