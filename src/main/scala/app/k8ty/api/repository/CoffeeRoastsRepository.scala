@@ -27,15 +27,21 @@ extends CoffeeRoastsRepository.Service {
   import ctx._
 
   override def allRoasts: fs2.Stream[Task, CoffeeRoasts] = {
-    val _query = quote(query[CoffeeRoasts].sortBy(_.id)(Ord.desc))
-    ctx.stream(_query).transact(xa)
+    ctx.stream(Queries.allRoasts).transact(xa)
   }
 
   override def roastById(id: Int): Task[Option[CoffeeRoasts]] = {
-    def _query(id: Int): ctx.Quoted[EntityQuery[CoffeeRoasts]] = quote {
+    ctx.run(Queries.roastById(id)).transact(xa).map(_.headOption)
+  }
+
+  private object Queries {
+
+    val allRoasts: ctx.Quoted[Query[CoffeeRoasts]] = quote(query[CoffeeRoasts].sortBy(_.id)(Ord.desc))
+
+    def roastById(id: Int): ctx.Quoted[EntityQuery[CoffeeRoasts]] = quote {
       query[CoffeeRoasts].filter(_.id == lift(id))
     }
-    ctx.run(_query(id)).transact(xa).map(_.headOption)
+
   }
 }
 
