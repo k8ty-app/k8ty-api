@@ -2,7 +2,7 @@ package app.k8ty.api.http.endpoints
 
 import cats.Applicative
 import io.circe.Encoder
-import org.http4s.{EntityEncoder, HttpRoutes, Status}
+import org.http4s.{EntityEncoder, HttpRoutes}
 import org.http4s.dsl.Http4sDsl
 import org.http4s.server.Router
 import zio.interop.catz._
