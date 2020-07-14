@@ -1,16 +1,15 @@
 package app.k8ty.api.http.endpoints
 
-import app.k8ty.api.repository.models.CoffeeRoasts
-import zio.RIO
-import io.circe.Encoder
-import org.http4s.{EntityEncoder, HttpRoutes}
+import app.k8ty.api.repository.coffee.roasts._
 import cats.Applicative
-import org.http4s.circe._
+import io.circe.Encoder
 import io.circe.syntax._
+import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
 import org.http4s.server.Router
+import org.http4s.{EntityEncoder, HttpRoutes}
+import zio.RIO
 import zio.interop.catz._
-import app.k8ty.api.repository._
 
 final class CoffeeRoastsEndpoint[R <: CoffeeRoastsRepository] {
   type CoffeeTask[A] = RIO[R,A]

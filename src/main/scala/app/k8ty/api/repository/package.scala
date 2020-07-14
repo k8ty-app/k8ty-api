@@ -5,8 +5,7 @@ import doobie.util.transactor.Transactor
 import zio._
 import zio.interop.catz._
 
-package object repository extends
-  CoffeeRoastsRepositoryPackage {
+package object repository {
 
   type DbTransactor = Has[DbTransactor.Resource]
 

@@ -1,4 +1,4 @@
-package app.k8ty.api.repository.models
+package app.k8ty.api.repository.coffee.friends
 
 import io.circe.Encoder
 import io.circe.generic.semiauto.deriveEncoder
