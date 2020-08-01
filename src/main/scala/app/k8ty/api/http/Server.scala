@@ -2,19 +2,18 @@ package app.k8ty.api.http
 
 import app.k8ty.api.environment.Environments.AppEnvironment
 import app.k8ty.api.config.Configuration.HttpServerConfig
-import app.k8ty.api.http.endpoints.HealthEndpoint
-
+import app.k8ty.api.http.endpoints.{CalibanEndpoint, CoffeeRoastsEndpoint, HealthEndpoint}
 import cats.data.Kleisli
 import cats.effect.ExitCode
 import cats.implicits._
 import org.http4s.implicits._
 import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.server.Router
-import org.http4s.server.middleware.{AutoSlash, GZip, CORS, CORSConfig}
+import org.http4s.server.middleware.{AutoSlash, CORS, CORSConfig, GZip}
 import org.http4s.{HttpRoutes, Request, Response}
 import zio.interop.catz._
-import zio.{RIO, ZIO}
-import app.k8ty.api.http.endpoints.CoffeeRoastsEndpoint
+import zio._
+
 import scala.concurrent.duration._
 
 object Server {
@@ -39,9 +38,10 @@ object Server {
       .orDie
 
   def createRoutes(basePath: String): ServerRoutes = {
-    val healthRoutes = new HealthEndpoint[AppEnvironment].routes
-    val coffeeRoutes = new CoffeeRoastsEndpoint[AppEnvironment].routes
-    val routes = healthRoutes <+> coffeeRoutes
+    val healthRoutes: HttpRoutes[HealthEndpoint[AppEnvironment]#HealthTask] = new HealthEndpoint[AppEnvironment].routes
+    val coffeeRoutes: HttpRoutes[CoffeeRoastsEndpoint[AppEnvironment]#CoffeeTask] = new CoffeeRoastsEndpoint[AppEnvironment].routes
+    val calibanRoutes = new CalibanEndpoint[AppEnvironment].routes
+    val routes = healthRoutes <+> coffeeRoutes <+> calibanRoutes
 
     Router[ServerRIO](basePath -> middleware(routes)).orNotFound
   }
