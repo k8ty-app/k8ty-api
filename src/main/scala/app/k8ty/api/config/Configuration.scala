@@ -15,10 +15,8 @@ object Configuration {
     final case class AppConfig(httpServer: HttpServerConfig, database: DbConfig)
 
 
-    val live: ULayer[Configuration] = ZLayer.fromEffectMany(
-        ZIO.effect(ConfigSource.default.loadOrThrow[AppConfig]) // Load our Configuration
-        .map(c => Has(c.httpServer) ++ Has(c.database)) // Map it to Has out case classes
-        .orDie
-    )
+    val live: ULayer[Configuration] = ZIO.effect(ConfigSource.default.loadOrThrow[AppConfig]) // Load our Configuration
+      .map(c => Has(c.httpServer) ++ Has(c.database)) // Map it to Has out case classes
+      .orDie.toLayerMany
 
 }
