@@ -19,7 +19,8 @@ lazy val root = (project in file("."))
       "io.circe"        %% "circe-parser"       % CirceVersion,
       "org.specs2"      %% "specs2-core"         % Specs2Version % "test",
       "ch.qos.logback"  %  "logback-classic"     % LogbackVersion,
-      "dev.zio"         %% "zio"                 % "1.0.0-RC21-1",
+      "dev.zio"         %% "zio"                 % "1.0.0-RC21-2",
+      "dev.zio"         %% "zio-streams"                 % "1.0.0-RC21-2",
       "dev.zio"         %% "zio-logging"         % "0.3.2",
       "dev.zio"         %% "zio-interop-cats"    % "2.1.3.0-RC16",
       "com.github.pureconfig" %% "pureconfig" % "0.13.0",
@@ -28,7 +29,9 @@ lazy val root = (project in file("."))
       "org.tpolecat" %% "doobie-quill" % "0.9.0",
       "io.getquill" %% "quill-jdbc" % "3.5.2",
       "org.postgresql" % "postgresql" % "42.2.14",
-      "com.google.firebase" % "firebase-admin" % "6.14.0"
+      "com.google.firebase" % "firebase-admin" % "6.14.0",
+      "com.github.ghostdogpr"        %% "caliban" % "0.9.0",
+      "com.github.ghostdogpr"        %% "caliban-http4s" % "0.9.0",
     ),
     addCompilerPlugin("org.typelevel" %% "kind-projector"     % "0.10.3"),
     addCompilerPlugin("com.olegpy"    %% "better-monadic-for" % "0.3.1")
