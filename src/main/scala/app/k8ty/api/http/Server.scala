@@ -48,7 +48,7 @@ object Server {
 
   private val originConfig = CORSConfig(
     anyOrigin = false,
-    allowedOrigins = Set("https://k8ty.app", "http://localhost:4200"),
+    allowedOrigins = Set("https://k8ty.app", "http://localhost:4200", "http://localhost:9000"),
     allowCredentials = false,
     maxAge = 1.day.toSeconds
   )
