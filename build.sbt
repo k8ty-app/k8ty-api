@@ -46,5 +46,12 @@ scalacOptions ++= Seq(
   "-Xfatal-warnings",
 )
 
+//  https://devcenter.heroku.com/articles/java-support#environment
+javaOptions in Universal ++= Seq(
+  "-Xmx300m",
+  "-Xss512k",
+  "-XX:CICompilerCount=2"
+)
+
 dockerExposedPorts  ++= Seq(9000)
 dockerBaseImage := "adoptopenjdk/openjdk14-openj9"
