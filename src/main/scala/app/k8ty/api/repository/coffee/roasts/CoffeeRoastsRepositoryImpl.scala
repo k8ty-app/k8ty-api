@@ -14,8 +14,8 @@ private[roasts] final case class CoffeeRoastsRepositoryImpl(xa: Transactor[Task]
   val ctx: DoobieContext.Postgres[SnakeCase.type] = new DoobieContext.Postgres(SnakeCase)
   import ctx._
 
-  override def allRoasts: fs2.Stream[Task, CoffeeRoasts] = {
-    ctx.stream(Queries.allRoasts).transact(xa)
+  override def allRoasts: Task[Seq[CoffeeRoasts]] = {
+    ctx.run(Queries.allRoasts).transact(xa)
   }
 
   override def roastById(id: Int): Task[Option[CoffeeRoasts]] = {
@@ -31,4 +31,5 @@ private[roasts] final case class CoffeeRoastsRepositoryImpl(xa: Transactor[Task]
     }
 
   }
+
 }

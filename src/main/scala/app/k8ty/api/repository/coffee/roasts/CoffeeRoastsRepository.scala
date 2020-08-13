@@ -6,7 +6,7 @@ import zio._
 object CoffeeRoastsRepository {
 
   trait Service {
-    def allRoasts: fs2.Stream[Task, CoffeeRoasts]
+    def allRoasts: Task[Seq[CoffeeRoasts]]
     def roastById(id: Int): Task[Option[CoffeeRoasts]]
   }
 

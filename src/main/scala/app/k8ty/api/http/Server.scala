@@ -1,65 +1,61 @@
 package app.k8ty.api.http
 
-import app.k8ty.api.environment.Environments.AppEnvironment
+import akka.actor.ActorSystem
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.server.Directives._
 import app.k8ty.api.config.Configuration.HttpServerConfig
+import app.k8ty.api.environment.Environments.AppEnvironment
 import app.k8ty.api.http.endpoints.{CalibanEndpoint, CoffeeRoastsEndpoint, HealthEndpoint}
-import cats.data.Kleisli
+import caliban.interop.circe.AkkaHttpCirceAdapter
 import cats.effect.ExitCode
-import cats.implicits._
-import org.http4s.implicits._
-import org.http4s.server.blaze.BlazeServerBuilder
-import org.http4s.server.Router
-import org.http4s.server.middleware.{AutoSlash, CORS, CORSConfig, GZip}
-import org.http4s.{HttpRoutes, Request, Response}
-import zio.interop.catz._
 import zio._
+import zio.console._
 
-import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContextExecutor, Future}
 
-object Server {
+object Server extends AkkaHttpCirceAdapter {
   type ServerRIO[A] = RIO[AppEnvironment, A]
-  type ServerRoutes =
-    Kleisli[ServerRIO, Request[ServerRIO], Response[ServerRIO]]
 
-  def runServer: ZIO[AppEnvironment, Nothing, Unit] =
+  def runServer: ServerRIO[ExitCode] =
     ZIO
-      .runtime[AppEnvironment]
-      .flatMap { implicit rts =>
-        val cfg = rts.environment.get[HttpServerConfig]
-        val ec = rts.platform.executor.asEC
+    .runtime[AppEnvironment]
+    .flatMap { implicit rts =>
+      val cfg = rts.environment.get[HttpServerConfig]
 
-        BlazeServerBuilder[ServerRIO](ec)
-          .bindHttp(cfg.port, cfg.host)
-          .withHttpApp(createRoutes(cfg.path))
-          .serve
-          .compile[ServerRIO, ServerRIO, ExitCode]
-          .drain
-      }
-      .orDie
+      for {
+        routes <- createAkkaHttpRoutes
+        as <- Managed.make(Task(ActorSystem("k8ty")))(sys => Task.fromFuture(_ => sys.terminate()).ignore).use { actorSystem =>
+          implicit val system: ActorSystem = actorSystem
+          implicit val executionContext: ExecutionContextExecutor = system.dispatcher
+          putStrLn(s"Running on ${cfg.host}:${cfg.port}").flatMap { _ =>
+            val bindingFuture: Future[Http.ServerBinding] =
+              Http().newServerAt(cfg.host, cfg.port).bind(routes)
+            ZIO.fromFuture(_ => bindingFuture).forever
+          }
 
-  def createRoutes(basePath: String): ServerRoutes = {
-    val healthRoutes: HttpRoutes[HealthEndpoint[AppEnvironment]#HealthTask] = new HealthEndpoint[AppEnvironment].routes
-    val coffeeRoutes: HttpRoutes[CoffeeRoastsEndpoint[AppEnvironment]#CoffeeTask] = new CoffeeRoastsEndpoint[AppEnvironment].routes
+        }
+      } yield ExitCode.Success
+
+    }.orDie
+
+
+  def createAkkaHttpRoutes = {
+    val healthRoutes = new HealthEndpoint[AppEnvironment].routes
+    val coffeeRoutes = new CoffeeRoastsEndpoint[AppEnvironment].routes
     val calibanRoutes = new CalibanEndpoint[AppEnvironment].routes
-    val routes = healthRoutes <+> coffeeRoutes <+> calibanRoutes
+    for {
+      health <- healthRoutes
+      coffee <- coffeeRoutes
+      caliban <- calibanRoutes
+      routes <- Task.succeed {
+        concat (
+          health,
+          coffee,
+          caliban
+        )
+      }
+    } yield routes
 
-    Router[ServerRIO](basePath -> middleware(routes)).orNotFound
   }
 
-  private val originConfig = CORSConfig(
-    anyOrigin = false,
-    allowedOrigins = Set("https://k8ty.app", "https://api.k8ty.app", "http://localhost:4200", "http://localhost:9000"),
-    allowCredentials = false,
-    maxAge = 1.day.toSeconds
-  )
-
-  private val middleware: HttpRoutes[ServerRIO] => HttpRoutes[ServerRIO] = {
-    { http: HttpRoutes[ServerRIO] =>
-      AutoSlash(http)
-    }.andThen { http: HttpRoutes[ServerRIO] =>
-      GZip(http)
-    }.andThen { http: HttpRoutes[ServerRIO] =>
-      CORS(http, originConfig)
-    }
-  }
 }
