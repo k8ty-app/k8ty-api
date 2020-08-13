@@ -10,7 +10,7 @@ import caliban.interop.circe.AkkaHttpCirceAdapter
 import cats.effect.ExitCode
 import zio._
 import zio.console._
-
+import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 object Server extends AkkaHttpCirceAdapter {
@@ -48,11 +48,13 @@ object Server extends AkkaHttpCirceAdapter {
       coffee <- coffeeRoutes
       caliban <- calibanRoutes
       routes <- Task.succeed {
-        concat (
-          health,
-          coffee,
-          caliban
-        )
+        cors() {
+          concat (
+            health,
+            coffee,
+            caliban
+          )
+        }
       }
     } yield routes
 
