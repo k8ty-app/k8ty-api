@@ -11,7 +11,10 @@ import cats.effect.ExitCode
 import zio._
 import zio.console._
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
+import com.fasterxml.jackson.core.format.InputAccessor.Std
+
 import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.io.StdIn
 
 object Server extends AkkaHttpCirceAdapter {
   type ServerRIO[A] = RIO[AppEnvironment, A]
@@ -24,15 +27,14 @@ object Server extends AkkaHttpCirceAdapter {
 
       for {
         routes <- createAkkaHttpRoutes
-        as <- Managed.make(Task(ActorSystem("k8ty")))(sys => Task.fromFuture(_ => sys.terminate()).ignore).use { actorSystem =>
-          implicit val system: ActorSystem = actorSystem
-          implicit val executionContext: ExecutionContextExecutor = system.dispatcher
-          putStrLn(s"Running on ${cfg.host}:${cfg.port}").flatMap { _ =>
-            val bindingFuture: Future[Http.ServerBinding] =
-              Http().newServerAt(cfg.host, cfg.port).bind(routes)
-            ZIO.fromFuture(_ => bindingFuture).forever
-          }
-
+        as <- Managed.make(Task(ActorSystem("k8ty")))(sys => Task.fromFuture(_ => sys.terminate()).ignore).use { implicit actorSystem =>
+          implicit val executionContext: ExecutionContextExecutor = actorSystem.dispatcher
+          val bindingFuture: Future[Http.ServerBinding] =
+            Http().newServerAt(cfg.host, cfg.port).bind(routes)
+          bindingFuture.flatMap(_.unbind())
+          putStrLn(s"Running on ${cfg.host}:${cfg.port}\nPress ENTER to exit")
+          StdIn.readLine()
+          putStrLn("Shutting down!")
         }
       } yield ExitCode.Success
 

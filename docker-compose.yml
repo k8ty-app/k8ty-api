@@ -1,0 +1,11 @@
+version: "3.4"
+
+services:
+
+  k8y-api:
+    image: docker.pkg.github.com/k8ty-app/k8ty-api/0.0.1:latest
+    restart: always
+    env_file:
+      - ~/.pass/env
+    ports:
+    - 80:9000
