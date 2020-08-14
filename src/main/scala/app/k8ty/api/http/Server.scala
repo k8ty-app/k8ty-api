@@ -11,10 +11,8 @@ import cats.effect.ExitCode
 import zio._
 import zio.console._
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
-import com.fasterxml.jackson.core.format.InputAccessor.Std
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
-import scala.io.StdIn
 
 object Server extends AkkaHttpCirceAdapter {
   type ServerRIO[A] = RIO[AppEnvironment, A]
