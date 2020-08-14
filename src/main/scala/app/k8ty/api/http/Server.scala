@@ -31,10 +31,7 @@ object Server extends AkkaHttpCirceAdapter {
           implicit val executionContext: ExecutionContextExecutor = actorSystem.dispatcher
           val bindingFuture: Future[Http.ServerBinding] =
             Http().newServerAt(cfg.host, cfg.port).bind(routes)
-          bindingFuture.flatMap(_.unbind())
-          putStrLn(s"Running on ${cfg.host}:${cfg.port}\nPress ENTER to exit")
-          StdIn.readLine()
-          putStrLn("Shutting down!")
+          putStrLn(s"Running on ${cfg.host}:${cfg.port}\nPress ENTER to exit") *> getStrLn
         }
       } yield ExitCode.Success
 

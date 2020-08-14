@@ -7,4 +7,4 @@ sbt "clean; docker:stage"
 cd target/docker/stage
 
 docker build -t docker.pkg.github.com/k8ty-app/k8ty-api/${VERSION}:latest .
-#docker push docker.pkg.github.com/k8ty-app/k8ty-api/${VERSION}:latest
+docker push docker.pkg.github.com/k8ty-app/k8ty-api/${VERSION}:latest
