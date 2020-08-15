@@ -3,8 +3,7 @@ k8ty-api
 
 This project is the back-end api for https://k8ty.app.
 
-As someone who has worked extensively with Play!, this is a project to get familiar with outer stacks,
-and is powered by ZIO and http4s.
+This is my first foray in ZIO (and Caliban for GraphQL)
 
 
 ## Wonderful Links
