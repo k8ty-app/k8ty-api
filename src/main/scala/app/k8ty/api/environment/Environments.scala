@@ -7,6 +7,7 @@ import app.k8ty.api.http.graphql.CalibanExampleData._
 import zio._
 import zio.clock.Clock
 import app.k8ty.api.repository._
+import app.k8ty.api.repository.coffee.roasts.CoffeeRoastsRepository.CoffeeRoastsRepository
 import app.k8ty.api.repository.coffee.roasts._
 
 object Environments {

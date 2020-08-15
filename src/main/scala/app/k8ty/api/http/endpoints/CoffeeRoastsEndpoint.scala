@@ -1,7 +1,8 @@
 package app.k8ty.api.http.endpoints
 
 import akka.http.scaladsl.server.Directives.{path, _}
-import app.k8ty.api.repository.coffee.roasts._
+import app.k8ty.api.repository.coffee.roasts.CoffeeRoasts
+import app.k8ty.api.repository.coffee.roasts.CoffeeRoastsRepository._
 import caliban.interop.circe.AkkaHttpCirceAdapter
 import zio.{RIO, Task}
 
