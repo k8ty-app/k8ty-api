@@ -8,7 +8,6 @@ import zio.{RIO, Task}
 
 final class CoffeeRoastsEndpoint[R <: CoffeeRoastsRepository] extends AkkaHttpCirceAdapter{
   type CoffeeTask[A] = RIO[R,A]
-  type CoffeeRoastStream = fs2.Stream[CoffeeTask, CoffeeRoasts]
 
   private val prefixPath = "coffee"
 

@@ -3,7 +3,7 @@ package app.k8ty.api.http.endpoints
 import akka.http.scaladsl.server.Directives.{getFromResource, path, _}
 import akka.http.scaladsl.server.Route
 import app.k8ty.api.environment.Environments.AppEnvironment
-import app.k8ty.api.http.graphql.{CalibanApi, CalibanExampleApi}
+import app.k8ty.api.http.graphql.{CalibanApi}
 import caliban.interop.circe.AkkaHttpCirceAdapter
 import caliban.{CalibanError, GraphQLInterpreter}
 import zio._
