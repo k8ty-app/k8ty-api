@@ -18,3 +18,4 @@ COPY . /
 RUN sbt docker:publishLocal
 
 FROM k8ty-api:0.0.1-SNAPSHOT as mainstage
+CMD []
