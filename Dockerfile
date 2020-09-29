@@ -12,15 +12,13 @@ RUN \
   apt-get update && \
   apt-get install sbt && \
   sbt sbtVersion
-
-WORKDIR /tmp
-COPY . .
+COPY . /
 RUN ["sbt", "docker:stage"]
 
 FROM adoptopenjdk/openjdk14-openj9 as stage0
 WORKDIR /opt/docker
-COPY --from=build0 /tmp/target/docker/stage/1/opt /1/opt
-COPY --from=build0 /tmp/target/docker/stage/2/opt /2/opt
+COPY --from=build0 /target/docker/stage/1/opt /1/opt
+COPY --from=build0 /target/docker/stage/2/opt /2/opt
 USER root
 RUN ["chmod", "-R", "u=rX,g=rX", "/1/opt/docker"]
 RUN ["chmod", "-R", "u=rX,g=rX", "/2/opt/docker"]
