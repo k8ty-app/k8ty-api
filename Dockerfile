@@ -13,7 +13,7 @@ RUN \
   apt-get install sbt && \
   sbt sbtVersion
 COPY . /
-RUN ["sbt", "docker:stage"]
+RUN sbt docker:stage
 
 FROM adoptopenjdk/openjdk14-openj9 as stage0
 WORKDIR /opt/docker
