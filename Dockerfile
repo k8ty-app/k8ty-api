@@ -15,7 +15,24 @@ RUN \
 
 WORKDIR /tmp
 COPY . /
-RUN sbt docker:publishLocal
+RUN sbt docker:stage
 
-FROM k8ty-api:0.0.1-SNAPSHOT as mainstage
+FROM adoptopenjdk/openjdk14-openj9 as stage0
+WORKDIR /opt/docker
+COPY --from=build0 /tmp/target/docker/stage/1/opt /1/opt
+COPY --from=build0 /tmp/target/docker/stage/2/opt /2/opt
+USER root
+RUN ["chmod", "-R", "u=rX,g=rX", "/1/opt/docker"]
+RUN ["chmod", "-R", "u=rX,g=rX", "/2/opt/docker"]
+RUN ["chmod", "u+x,g+x", "/1/opt/docker/bin/k8ty-api"]
+
+FROM adoptopenjdk/openjdk14-openj9 as mainstage
+USER root
+RUN id -u demiourgos728 1>/dev/null 2>&1 || (( getent group 0 1>/dev/null 2>&1 || ( type groupadd 1>/dev/null 2>&1 && groupadd -g 0 root || addgroup -g 0 -S root )) && ( type useradd 1>/dev/null 2>&1 && useradd --system --create-home --uid 1001 --gid 0 demiourgos728 || adduser -S -u 1001 -G root demiourgos728 ))
+WORKDIR /opt/docker
+COPY --from=stage0 --chown=demiourgos728:root /1/opt/docker /opt/docker
+COPY --from=stage0 --chown=demiourgos728:root /2/opt/docker /opt/docker
+EXPOSE 9000
+USER 1001:0
+ENTRYPOINT ["/opt/docker/bin/k8ty-api"]
 CMD []
