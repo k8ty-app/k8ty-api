@@ -2,20 +2,17 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: k8ty-api
-  namespace: k8ty-api
   labels:
     app: k8ty-api
   annotations:
     fluxcd.io/automated: "true"
 spec:
-  strategy:
-    rollingUpdate:
-      maxUnavailable: 0
-    type: RollingUpdate
+  replicas: 1
   selector:
     matchLabels:
       app: k8ty-api
   template:
+    metadata:
       labels:
         app: k8ty-api
     spec:
@@ -42,3 +39,4 @@ spec:
               path: /_health
               port: 9000
           resources: {}
+---
