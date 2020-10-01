@@ -6,6 +6,9 @@ This project is the back-end api for https://k8ty.app.
 This is my first foray in ZIO (and Caliban for GraphQL)
 
 
+## kubeseal
+https://github.com/bitnami-labs/sealed-secrets#usage
+
 ## Wonderful Links
 
 * https://github.com/juliano/streaming-all-the-way
