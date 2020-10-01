@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: k8ty-api
+  name: k8ty-api
+  namespace: k8ty-api
+spec:
+  type: ClusterIP
+  selector:
+    app: k8ty-api
+  ports:
+    - port: 9000
+      name: http
+      protocol: TCP
+      targetPort: http
