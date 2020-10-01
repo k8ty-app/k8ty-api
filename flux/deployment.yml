@@ -4,8 +4,6 @@ metadata:
   name: k8ty-api
   labels:
     app: k8ty-api
-  annotations:
-    fluxcd.io/automated: "true"
 spec:
   replicas: 1
   selector:
