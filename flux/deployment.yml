@@ -8,7 +8,7 @@ metadata:
   annotations:
     fluxcd.io/automated: "true"
 spec:
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
       app: k8ty-api
